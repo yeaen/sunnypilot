@@ -7,6 +7,7 @@ from openpilot.selfdrive.ui.mici.onroad.augmented_road_view import AugmentedRoad
 from openpilot.selfdrive.ui.ui_state import device, ui_state
 from openpilot.selfdrive.ui.mici.layouts.onboarding import OnboardingWindow
 from openpilot.selfdrive.ui.body.layouts.onroad import BodyLayout
+from openpilot.selfdrive.ui.mici.widgets.dialog import BigDialog, BigConfirmationDialog
 from openpilot.system.ui.widgets import Widget
 from openpilot.system.ui.widgets.scroller import Scroller
 from openpilot.system.ui.lib.application import gui_app
@@ -146,9 +147,35 @@ class MiciMainLayout(Scroller):
       self._scroll_to(self._home_layout)
 
   def _on_bookmark_clicked(self):
-    for service in ('bookmarkButton', 'userBookmark'):
-      msg = messaging.new_message(service, valid=True)
-      self._pm.send(service, msg)
+    action = ui_state.params.get("RightSwipeAction") or 0
+    if action == 1:
+      self._confirm_power_action("reboot")
+    elif action == 2:
+      self._confirm_power_action("power off")
+    else:
+      for service in ('bookmarkButton', 'userBookmark'):
+        msg = messaging.new_message(service, valid=True)
+        self._pm.send(service, msg)
+
+  def _confirm_power_action(self, action_text: str):
+    if ui_state.engaged:
+      gui_app.push_widget(BigDialog("", f"Disengage to {action_text}"))
+      return
+
+    if action_text == "reboot":
+      icon = gui_app.texture("icons_mici/settings/device/reboot.png", 64, 70)
+    else:
+      icon = gui_app.texture("icons_mici/settings/device/power.png", 64, 66)
+
+    def do_action():
+      if not ui_state.engaged:
+        if action_text == "reboot":
+          ui_state.params.put_bool("DoReboot", True, block=True)
+        else:
+          ui_state.params.put_bool("DoShutdown", True, block=True)
+
+    gui_app.push_widget(BigConfirmationDialog(f"slide to\n{action_text}", icon, do_action, exit_on_confirm=False,
+                                              red=action_text != "reboot"))
 
   def _on_body_changed(self):
     self._car_onroad_layout.set_visible(not ui_state.is_body)

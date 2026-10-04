@@ -24,6 +24,17 @@ sections:
       label: Standard
     - value: 1
       label: Always Offroad
+  - key: RightSwipeAction
+    widget: option
+    title: Right Edge Swipe Action
+    description: Action triggered by swiping left from the right edge of the onroad screen.
+    options:
+    - value: 0
+      label: Bookmark
+    - value: 1
+      label: Reboot
+    - value: 2
+      label: Power Off
   - key: QuietMode
     widget: toggle
     title: Quiet Mode

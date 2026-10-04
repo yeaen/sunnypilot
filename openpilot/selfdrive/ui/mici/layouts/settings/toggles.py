@@ -50,6 +50,7 @@ class TogglesLayoutMici(NavScroller):
     record_front = BigParamControl("record & upload cabin camera", "RecordFront", toggle_callback=restart_needed_callback)
     record_mic = BigParamControl("record & upload mic audio", "RecordAudio", toggle_callback=restart_needed_callback)
     enable_openpilot = BigParamControl("enable sunnypilot", "OpenpilotEnabledToggle", toggle_callback=restart_needed_callback)
+    swipe_action_toggle = BigMultiParamToggle("right edge swipe", "RightSwipeAction", ["bookmark", "reboot", "power off"])
 
     self._scroller.add_widgets([
       self._personality_toggle,
@@ -60,6 +61,7 @@ class TogglesLayoutMici(NavScroller):
       record_front,
       record_mic,
       enable_openpilot,
+      swipe_action_toggle,
     ])
 
     # Toggle lists
